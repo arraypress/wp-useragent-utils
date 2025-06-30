@@ -515,10 +515,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 This project is licensed under the GPL-2.0-or-later License.
 
-**Disposable Domain Lists:** Licensed under CC0 (Public Domain) by the disposable-email-domains project.
-
 ## Support
 
-- [Documentation](https://github.com/arraypress/email-utils)
-- [Issue Tracker](https://github.com/arraypress/email-utils/issues)
-- [Disposable Email Domains Project](https://github.com/disposable-email-domains/disposable-email-domains)
+- [Documentation](https://github.com/arraypress/wp-useragent-utils)
+- [Issue Tracker](https://github.com/arraypress/wp-useragent-utils/issues)
