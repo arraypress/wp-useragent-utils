@@ -150,6 +150,30 @@ class UserAgent {
 	}
 
 	/**
+	 * Get truncated user agent string for storage.
+	 *
+	 * @param string|null $user_agent Optional user agent string to truncate.
+	 * @param int         $max_length Maximum length (default 500 characters).
+	 *
+	 * @return string Truncated user agent string.
+	 */
+	public static function get_truncated( ?string $user_agent = null, int $max_length = 500 ): string {
+		$ua = $user_agent ?? self::get();
+
+		if ( empty( $ua ) || $max_length <= 0 ) {
+			return '';
+		}
+
+		// If it's already within limit, return as-is
+		if ( strlen( $ua ) <= $max_length ) {
+			return $ua;
+		}
+
+		// Truncate and add ellipsis if needed
+		return substr( $ua, 0, $max_length - 3 ) . '...';
+	}
+
+	/**
 	 * Get the detected browser name.
 	 *
 	 * @param string|null $user_agent Optional user agent string to check.
