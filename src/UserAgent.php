@@ -168,30 +168,6 @@ class UserAgent {
 	}
 
 	/**
-	 * Get truncated user agent string for storage.
-	 *
-	 * @param string|null $user_agent Optional user agent string to truncate.
-	 * @param int         $max_length Maximum length (default 500 characters).
-	 *
-	 * @return string Truncated user agent string.
-	 */
-	public static function get_truncated( ?string $user_agent = null, int $max_length = 500 ): string {
-		$ua = $user_agent ?? self::get();
-
-		if ( empty( $ua ) || $max_length <= 0 ) {
-			return '';
-		}
-
-		// If it's already within limit, return as-is
-		if ( strlen( $ua ) <= $max_length ) {
-			return $ua;
-		}
-
-		// Truncate and add ellipsis if needed
-		return substr( $ua, 0, $max_length - 3 ) . '...';
-	}
-
-	/**
 	 * Get the detected browser name.
 	 *
 	 * @param string|null $user_agent Optional user agent string to check.
@@ -214,33 +190,6 @@ class UserAgent {
 	}
 
 	/**
-	 * Get the browser version.
-	 *
-	 * @param string|null $user_agent Optional user agent string to check.
-	 *
-	 * @return string|null The browser version or null if not detected.
-	 */
-	public static function get_browser_version( ?string $user_agent = null ): ?string {
-		$ua = $user_agent ?? self::get();
-		if ( empty( $ua ) ) {
-			return null;
-		}
-
-		foreach ( self::$browsers as $browser => $pattern ) {
-			if ( preg_match( "/$pattern/i", $ua, $matches ) ) {
-				// Return the first non-empty capture group
-				for ( $i = 1; $i < count( $matches ); $i ++ ) {
-					if ( ! empty( $matches[ $i ] ) ) {
-						return $matches[ $i ];
-					}
-				}
-			}
-		}
-
-		return null;
-	}
-
-	/**
 	 * Get the operating system.
 	 *
 	 * @param string|null $user_agent Optional user agent string to check.
@@ -256,36 +205,6 @@ class UserAgent {
 		foreach ( self::$operating_systems as $os => $pattern ) {
 			if ( preg_match( "/$pattern/i", $ua ) ) {
 				return $os;
-			}
-		}
-
-		return null;
-	}
-
-	/**
-	 * Get the operating system version.
-	 *
-	 * @param string|null $user_agent Optional user agent string to check.
-	 *
-	 * @return string|null The OS version or null if not detected.
-	 */
-	public static function get_os_version( ?string $user_agent = null ): ?string {
-		$ua = $user_agent ?? self::get();
-		if ( empty( $ua ) ) {
-			return null;
-		}
-
-		$os = self::get_os( $ua );
-		if ( ! $os || ! isset( self::$operating_systems[ $os ] ) ) {
-			return null;
-		}
-
-		if ( preg_match( '/' . self::$operating_systems[ $os ] . '/i', $ua, $matches ) ) {
-			// Return the first non-empty capture group
-			for ( $i = 1; $i < count( $matches ); $i ++ ) {
-				if ( ! empty( $matches[ $i ] ) ) {
-					return str_replace( '_', '.', $matches[ $i ] );
-				}
 			}
 		}
 
@@ -325,22 +244,6 @@ class UserAgent {
 	}
 
 	/**
-	 * Check if the user agent is a tablet.
-	 *
-	 * @param string|null $user_agent Optional user agent string to check.
-	 *
-	 * @return bool True if tablet device.
-	 */
-	public static function is_tablet( ?string $user_agent = null ): bool {
-		$ua = $user_agent ?? self::get();
-		if ( empty( $ua ) ) {
-			return false;
-		}
-
-		return (bool) preg_match( '/iPad|Android(?!.*Mobile)|Tablet/i', $ua );
-	}
-
-	/**
 	 * Check if the user agent is a desktop device.
 	 *
 	 * @param string|null $user_agent Optional user agent string to check.
@@ -348,7 +251,7 @@ class UserAgent {
 	 * @return bool True if desktop device.
 	 */
 	public static function is_desktop( ?string $user_agent = null ): bool {
-		return ! self::is_mobile( $user_agent ) && ! self::is_tablet( $user_agent );
+		return ! self::is_mobile( $user_agent );
 	}
 
 	/**
@@ -370,51 +273,19 @@ class UserAgent {
 	}
 
 	/**
-	 * Check if the user agent is an Electron-based application.
-	 *
-	 * @param string|null $user_agent Optional user agent string to check.
-	 *
-	 * @return bool True if Electron-based.
-	 */
-	public static function is_electron( ?string $user_agent = null ): bool {
-		$ua = $user_agent ?? self::get();
-		if ( empty( $ua ) ) {
-			return false;
-		}
-
-		return (bool) preg_match( '/Electron/i', $ua );
-	}
-
-	/**
-	 * Check if the user agent is a WebView.
-	 *
-	 * @param string|null $user_agent Optional user agent string to check.
-	 *
-	 * @return bool True if WebView.
-	 */
-	public static function is_webview( ?string $user_agent = null ): bool {
-		$ua = $user_agent ?? self::get();
-		if ( empty( $ua ) ) {
-			return false;
-		}
-
-		return (bool) preg_match( '/wv|WebView/i', $ua );
-	}
-
-	/**
 	 * Get device type as a string.
 	 *
 	 * @param string|null $user_agent Optional user agent string to check.
 	 *
-	 * @return string Device type: 'mobile', 'tablet', 'desktop', or 'unknown'.
+	 * @return string Device type: 'mobile', 'desktop', 'bot', or 'unknown'.
 	 */
 	public static function get_device_type( ?string $user_agent = null ): string {
-		if ( self::is_mobile( $user_agent ) ) {
-			return 'mobile';
+		if ( self::is_bot( $user_agent ) ) {
+			return 'bot';
 		}
 
-		if ( self::is_tablet( $user_agent ) ) {
-			return 'tablet';
+		if ( self::is_mobile( $user_agent ) ) {
+			return 'mobile';
 		}
 
 		if ( self::is_desktop( $user_agent ) ) {
@@ -425,47 +296,19 @@ class UserAgent {
 	}
 
 	/**
-	 * Get a formatted user agent string in EDD Browser library format.
+	 * Get a formatted user agent string for display/storage.
 	 *
 	 * @param string|null $user_agent Optional user agent string to check.
 	 *
-	 * @return string Formatted string in format "Browser Version/Platform".
+	 * @return string Formatted string in format "Browser on OS".
 	 */
 	public static function get_formatted( ?string $user_agent = null ): string {
 		$ua = $user_agent ?? self::get();
 
-		$browser  = self::get_browser( $ua ) ?? 'Unknown';
-		$version  = self::get_browser_version( $ua ) ?? 'Unknown';
-		$platform = self::get_os( $ua ) ?? 'Unknown';
+		$browser = self::get_browser( $ua ) ?? 'Unknown Browser';
+		$os      = self::get_os( $ua ) ?? 'Unknown OS';
 
-		return sprintf( '%s %s/%s', $browser, $version, $platform );
-	}
-
-	/**
-	 * Get comprehensive device information.
-	 *
-	 * @param string|null $user_agent Optional user agent string to check.
-	 *
-	 * @return array Array of device information.
-	 */
-	public static function get_device_info( ?string $user_agent = null ): array {
-		$ua = $user_agent ?? self::get();
-
-		return [
-			'user_agent'      => $ua,
-			'browser'         => self::get_browser( $ua ),
-			'browser_version' => self::get_browser_version( $ua ),
-			'os'              => self::get_os( $ua ),
-			'os_version'      => self::get_os_version( $ua ),
-			'device_type'     => self::get_device_type( $ua ),
-			'is_mobile'       => self::is_mobile( $ua ),
-			'is_tablet'       => self::is_tablet( $ua ),
-			'is_desktop'      => self::is_desktop( $ua ),
-			'is_bot'          => self::is_bot( $ua ),
-			'is_electron'     => self::is_electron( $ua ),
-			'is_webview'      => self::is_webview( $ua ),
-			'formatted'       => self::get_formatted( $ua ),
-		];
+		return sprintf( '%s on %s', $browser, $os );
 	}
 
 	/**
@@ -484,53 +327,6 @@ class UserAgent {
 		}
 
 		return strcasecmp( $detected_browser, $browser ) === 0;
-	}
-
-	/**
-	 * Check browser version against criteria.
-	 *
-	 * @param string      $browser    Browser name to check.
-	 * @param string      $operator   Comparison operator (>=, >, <, <=, ==, !=).
-	 * @param string      $version    Version to compare against.
-	 * @param string|null $user_agent Optional user agent string.
-	 *
-	 * @return bool True if version criteria met.
-	 */
-	public static function is_browser_version( string $browser, string $operator, string $version, ?string $user_agent = null ): bool {
-		if ( ! self::is_browser( $browser, $user_agent ) ) {
-			return false;
-		}
-
-		$detected_version = self::get_browser_version( $user_agent );
-
-		if ( ! $detected_version ) {
-			return false;
-		}
-
-		return version_compare( $detected_version, $version, $operator );
-	}
-
-	/**
-	 * Check if the user agent appears suspicious or malformed.
-	 *
-	 * @param string|null $user_agent Optional user agent string to check.
-	 *
-	 * @return bool True if suspicious.
-	 */
-	public static function is_suspicious( ?string $user_agent = null ): bool {
-		$ua = $user_agent ?? self::get();
-
-		// Empty or very short user agent
-		if ( strlen( $ua ) < 10 ) {
-			return true;
-		}
-
-		// Already detected as bot
-		if ( self::is_bot( $ua ) ) {
-			return true;
-		}
-
-		return false;
 	}
 
 }
