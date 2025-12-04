@@ -1,5 +1,5 @@
 {
-  "name": "arraypress/wp-utils-useragent",
+  "name": "arraypress/wp-useragent-utils",
   "version": "1.0.0",
   "description": "A lean WordPress utility for browser detection, device recognition, and bot identification",
   "type": "library",
