@@ -18,7 +18,7 @@ A lean WordPress utility for browser detection, device recognition, and bot iden
 
 ## Installation
 ```bash
-composer require arraypress/wp-utils-useragent
+composer require arraypress/wp-user-agent-utils
 ```
 
 ## Usage
